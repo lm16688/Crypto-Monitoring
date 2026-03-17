@@ -27,8 +27,8 @@ wheels/
 logs/
 *.log
 
-# Reports
-report_*.md
+# Reports (keep in repo for history)
+# report_*.md
 
 # Environment
 .env

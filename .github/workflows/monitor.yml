@@ -54,7 +54,7 @@ jobs:
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add report_*.md
+        git add -f report_*.md 2>/dev/null || true
         git add docs/
         git diff --staged && git commit -m "Auto-update: Crypto monitoring report $(date '+%Y-%m-%d %H:%M:%S')" || exit 0
         git push
