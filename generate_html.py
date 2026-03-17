@@ -37,8 +37,13 @@ def extract_latest_report_from_readme():
         category = match.group(7).strip()
         
         # 判断是主流货币还是meme币
-        # 市值超过10万美元的为主流货币
-        is_mainstream = float(market_cap) >= 100000
+        # 主流货币：稳定、成熟的加密货币项目（评分>=60且叙事属于AI/DeFi/基础设施等成熟叙事）
+        mainstream_categories = ['AI', 'DeFi', '基础设施', '金融', '区块链技术', 'Web3']
+        is_mainstream = (
+            score >= 60 and 
+            any(cat in category for cat in mainstream_categories) and
+            float(market_cap) >= 50000  # 稳定市值
+        )
         
         token = {
             'rank': rank,
@@ -299,7 +304,7 @@ def generate_html(tokens):
         
         <div class="section">
             <h2 class="section-title">💎 主流货币板块</h2>
-            <p style="color: #666; margin-bottom: 15px;">市值 ≥ $100,000 的稳定项目</p>
+            <p style="color: #666; margin-bottom: 15px;">稳定、成熟的加密货币项目（AI、DeFi、基础设施等强叙事，评分≥60，市值≥$50K）</p>
             
             <div class="stats">
                 <div class="stat-card">
@@ -336,7 +341,7 @@ def generate_html(tokens):
         
         <div class="section">
             <h2 class="section-title">🎲 Meme币板块</h2>
-            <p style="color: #666; margin-bottom: 15px;">市值 < $100,000 的高潜力早期项目</p>
+            <p style="color: #666; margin-bottom: 15px;">pump.fun和X平台热门讨论的高潜力早期项目（强叙事+强社区推动，不限市值）</p>
             
             <div class="stats">
                 <div class="stat-card">
