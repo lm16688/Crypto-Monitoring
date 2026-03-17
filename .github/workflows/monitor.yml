@@ -1,0 +1,60 @@
+name: Crypto Monitoring
+
+on:
+  # 定时运行：每小时一次（UTC时间）
+  schedule:
+    - cron: '0 * * * *'
+  
+  # 手动触发
+  workflow_dispatch:
+  
+  # 每次推送时也运行（可选）
+  # push:
+  #   branches: [ main ]
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests beautifulsoup4
+    
+    - name: Run monitor script
+      run: |
+        python monitor.py
+      env:
+        TZ: 'Asia/Shanghai'
+    
+    - name: Generate HTML report
+      run: |
+        python generate_html.py
+    
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
+        publish_branch: gh-pages
+        force_orphan: true
+    
+    - name: Commit and push report
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add report_*.md
+        git add docs/
+        git diff --staged && git commit -m "Auto-update: Crypto monitoring report $(date '+%Y-%m-%d %H:%M:%S')" || exit 0
+        git push
