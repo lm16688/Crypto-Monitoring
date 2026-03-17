@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Crypto Monitoring - 加密货币监控系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .update-time {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background: #f8f9ff;
+        }
+        
+        .score {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .score.high {
+            color: #10b981;
+        }
+        
+        .score.medium {
+            color: #f59e0b;
+        }
+        
+        .score.low {
+            color: #ef4444;
+        }
+        
+        .rating {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .rating.high {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .rating.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .rating.low {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .growth {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .growth.negative {
+            color: #ef4444;
+        }
+        
+        .category-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #e0e7ff;
+            color: #4338ca;
+            border-radius: 12px;
+            font-size: 0.85em;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            padding: 30px 20px;
+            margin-top: 30px;
+        }
+        
+        .warning {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ef4444;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 10px;
+                font-size: 0.9em;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Crypto Monitoring</h1>
+            <p>加密货币实时监控和分析系统</p>
+            <div class="update-time">⏰ 最后更新: 2026-03-17 10:40:43 (UTC+8)</div>
+        </header>
+        
+        <div class="section">
+            <div class="warning">
+                <strong>⚠️ 风险提示：</strong>Meme币投资风险极高，可能导致本金全部损失。本报告仅供参考，不构成投资建议。请务必DYOR（自己做研究）！
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">💎 主流货币板块</h2>
+            <p style="color: #666; margin-bottom: 15px;">市值 ≥ $100,000 的稳定项目</p>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>总数量</h3>
+                    <div class="value">2</div>
+                </div>
+                <div class="stat-card">
+                    <h3>高评分项目</h3>
+                    <div class="value">1</div>
+                </div>
+                <div class="stat-card">
+                    <h3>平均评分</h3>
+                    <div class="value">82.5</div>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>排名</th>
+                        <th>代币</th>
+                        <th>市值</th>
+                        <th>增长率</th>
+                        <th>评分</th>
+                        <th>评级</th>
+                        <th>分类</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr>
+            <td><strong>#1</strong></td>
+            <td><strong>XAICASH</strong></td>
+            <td>$182.6K</td>
+            <td class="growth ">+31.73%</td>
+            <td class="score high">95/100</td>
+            <td><span class="rating high">重点跟踪</span></td>
+            <td><span class="category-badge">AI</span></td>
+        </tr>
+        
+
+        <tr>
+            <td><strong>#4</strong></td>
+            <td><strong>TRUMPHOUSE</strong></td>
+            <td>$161.4K</td>
+            <td class="growth ">+10.06%</td>
+            <td class="score medium">70/100</td>
+            <td><span class="rating medium">值得关注</span></td>
+            <td><span class="category-badge">政治</span></td>
+        </tr>
+        
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">🎲 Meme币板块</h2>
+            <p style="color: #666; margin-bottom: 15px;">市值 < $100,000 的高潜力早期项目</p>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>总数量</h3>
+                    <div class="value">2</div>
+                </div>
+                <div class="stat-card">
+                    <h3>高评分项目</h3>
+                    <div class="value">2</div>
+                </div>
+                <div class="stat-card">
+                    <h3>平均评分</h3>
+                    <div class="value">87.5</div>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>排名</th>
+                        <th>代币</th>
+                        <th>市值</th>
+                        <th>增长率</th>
+                        <th>评分</th>
+                        <th>评级</th>
+                        <th>分类</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr>
+            <td><strong>#2</strong></td>
+            <td><strong>PVE</strong></td>
+            <td>$13.2K</td>
+            <td class="growth ">+378.40%</td>
+            <td class="score high">90/100</td>
+            <td><span class="rating high">重点跟踪</span></td>
+            <td><span class="category-badge">游戏</span></td>
+        </tr>
+        
+
+        <tr>
+            <td><strong>#3</strong></td>
+            <td><strong>CRAWSTAR</strong></td>
+            <td>$12.7K</td>
+            <td class="growth ">+11.60%</td>
+            <td class="score high">85/100</td>
+            <td><span class="rating high">重点跟踪</span></td>
+            <td><span class="category-badge">AI Agent</span></td>
+        </tr>
+        
+                </tbody>
+            </table>
+        </div>
+        
+        <footer>
+            <p>🔗 <a href="https://github.com/lm16688/Crypto-Monitoring" style="color: white; text-decoration: underline;">GitHub仓库</a> | ⏱️ 每小时自动更新</p>
+            <p style="margin-top: 10px; opacity: 0.8;">使用 ❤️ 和 AI Agent 构建</p>
+        </footer>
+    </div>
+</body>
+</html>

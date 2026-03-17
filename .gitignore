@@ -27,8 +27,8 @@ wheels/
 logs/
 *.log
 
-# Reports (keep recent one optional)
-# report_*.md
+# Reports
+report_*.md
 
 # Environment
 .env
