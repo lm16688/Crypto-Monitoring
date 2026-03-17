@@ -1,461 +1,428 @@
 #!/usr/bin/env python3
 """
-HTML报告生成器 - 为GitHub Pages创建Web界面
+Crypto Monitoring - 完整信息HTML生成器
+展示所有代币相关信息
 """
-
-import os
-import re
-import json
+import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 
-def extract_latest_report_from_readme():
-    """从README中提取最新的代币数据"""
-    readme_path = Path(__file__).parent / 'README.md'
+def run_monitor_and_get_data():
+    """运行monitor.py并获取数据"""
+    print("📊 开始生成HTML报告...")
     
-    if not readme_path.exists():
-        return []
+    result = subprocess.run([sys.executable, 'monitor.py'], 
+                          capture_output=True, text=True, 
+                          cwd=Path(__file__).parent)
     
-    with open(readme_path, 'r', encoding='utf-8') as f:
-        content = f.read()
+    print(result.stdout[-300:] if len(result.stdout) > 300 else result.stdout)
     
-    # 提取表格数据
-    tokens = []
+    import monitor
     
-    # 查找TOP表格部分
-    table_pattern = r'\|\s*(\d+)\s*\|\s*\*\*([A-Z]+)\*\*\s*\|\s*\$([\d,]+)\s*\|\s*([\d.]+)%\s*\|\s*\*\*(\d+)/100\*\*\s*\|\s*[🟢🟡🔴]\s*(重点跟踪|值得关注|观望)\s*\|\s*([^\|]+)\s*\|'
+    monitor_instance = monitor.MemeCoinMonitor()
+    meme_coins = monitor_instance.fetch_pump_data()
+    mainstream_coins = monitor_instance.fetch_mainstream_data()
     
-    matches = re.finditer(table_pattern, content)
+    analyzed_meme = monitor_instance.analyze_coins(meme_coins)
+    analyzed_mainstream = monitor_instance.analyze_coins(mainstream_coins)
     
-    for match in matches:
-        rank = int(match.group(1))
-        symbol = match.group(2)
-        market_cap = match.group(3).replace(',', '')
-        growth_rate = float(match.group(4))
-        score = int(match.group(5))
-        rating = match.group(6)
-        category = match.group(7).strip()
-        
-        # 判断是主流货币还是meme币
-        # 主流货币：稳定、成熟的加密货币项目（评分>=60且叙事属于AI/DeFi/基础设施等成熟叙事）
-        mainstream_categories = ['AI', 'DeFi', '基础设施', '金融', '区块链技术', 'Web3']
-        is_mainstream = (
-            score >= 60 and 
-            any(cat in category for cat in mainstream_categories) and
-            float(market_cap) >= 50000  # 稳定市值
-        )
-        
-        token = {
-            'rank': rank,
-            'symbol': symbol,
-            'market_cap': float(market_cap),
-            'growth_rate': growth_rate,
-            'score': score,
-            'rating': rating,
-            'category': category.strip(),
-            'is_mainstream': is_mainstream
-        }
-        
-        tokens.append(token)
-    
-    return tokens
+    return analyzed_meme, analyzed_mainstream
 
-def generate_html(tokens):
-    """生成HTML页面"""
+def format_market_cap(mc):
+    """格式化市值"""
+    if mc >= 1000000000:
+        return f"${mc/1000000000:.2f}B"
+    elif mc >= 1000000:
+        return f"${mc/1000000:.2f}M"
+    elif mc >= 1000:
+        return f"${mc/1000:.1f}K"
+    return f"${mc:,.0f}"
+
+def format_holders(h):
+    """格式化持有人数"""
+    if h >= 1000000:
+        return f"{h/1000000:.1f}M"
+    elif h >= 1000:
+        return f"{h/1000:.0f}K"
+    return f"{h:,}"
+
+def generate_coin_detail(coin, is_meme=True):
+    """生成完整的代币详情卡片"""
+    score_class = 'border-green-500 text-green-400' if coin['score'] >= 80 else 'border-yellow-500 text-yellow-400' if coin['score'] >= 60 else 'border-red-500 text-red-400'
+    rating_badge = 'bg-green-500/20 text-green-400' if coin['score'] >= 80 else 'bg-yellow-500/20 text-yellow-400' if coin['score'] >= 60 else 'bg-red-500/20 text-red-400'
     
-    # 分类数据
-    mainstream_tokens = [t for t in tokens if t['is_mainstream']]
-    meme_tokens = [t for t in tokens if not t['is_mainstream']]
+    # X平台帖子
+    x_posts_html = ''
+    for post in coin.get('x_posts', [])[:3]:
+        post_url = post.get('url', '#')
+        x_posts_html += f'''
+        <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-blue-400 font-medium">{post["author"]}</span>
+                <span class="text-xs text-gray-500 bg-gray-700/30 px-2 py-1 rounded">热门帖子</span>
+            </div>
+            <p class="text-gray-300 text-sm mb-3 line-clamp-2">{post["content"]}</p>
+            <div class="flex items-center justify-between">
+                <div class="flex gap-4 text-xs text-gray-400">
+                    <span>👍 {post["likes"]:,}</span>
+                    <span>💬 {post["comments"]:,}</span>
+                </div>
+                <a href="{post_url}" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs flex items-center gap-1">
+                    查看帖子 <span>→</span>
+                </a>
+            </div>
+        </div>
+        '''
     
-    # 排序
-    mainstream_tokens.sort(key=lambda x: x['score'], reverse=True)
-    meme_tokens.sort(key=lambda x: x['score'], reverse=True)
+    # 新闻
+    news_html = ''
+    for news in coin.get('news', [])[:5]:
+        news_html += f'''
+        <div class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50">
+            <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+            <p class="text-gray-300 text-sm line-clamp-2">{news}</p>
+        </div>
+        '''
     
-    # 获取更新时间
+    # 高频关键词
+    keywords = coin.get('high_frequency_keywords', [])
+    keywords_html = ' '.join([f'<span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">{k}</span>' for k in keywords]) if keywords else ''
+    
+    # X平台链接
+    x_official = coin.get('x_official_account', '')
+    x_community = coin.get('x_community_url', '')
+    
+    return f'''
+    <div class="bg-gray-900/50 rounded-2xl p-6 border border-gray-800 hover:border-gray-700 transition-all duration-300 mb-6">
+        <!-- 头部 -->
+        <div class="flex items-start justify-between mb-6 pb-6 border-b border-gray-800">
+            <div class="flex items-center gap-5">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                    {coin["symbol"][:2]}
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-white mb-1">{coin["name"]}</h3>
+                    <p class="text-base text-gray-400">{coin["symbol"]}</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="px-3 py-1 rounded-lg {rating_badge} font-semibold text-sm">
+                            {coin["score"]}/100
+                        </span>
+                        <span class="text-lg">{coin["rating"]}</span>
+                    </div>
+                </div>
+            </div>
+            <a href="{coin.get('x_community_url', '#')}" target="_blank" class="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                🐦 X平台社区
+            </a>
+        </div>
+        
+        <!-- 基本信息 -->
+        <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="bg-gray-800/50 rounded-xl p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">市值</div>
+                <div class="text-xl font-bold text-white">{format_market_cap(coin["market_cap"])}</div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">持有人数</div>
+                <div class="text-xl font-bold text-white">{format_holders(coin.get('holders', 0))}</div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">24h涨幅</div>
+                <div class="text-xl font-bold {"text-green-400" if coin["growth"] > 0 else "text-red-400"}">
+                    {"+" if coin["growth"] > 0 else ""}{coin["growth"]:.2f}%
+                </div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">创建时间</div>
+                <div class="text-xl font-bold text-white text-sm">{coin.get('created_time', 'N/A')}</div>
+            </div>
+        </div>
+        
+        <!-- 合约地址 -->
+        <div class="bg-gray-800/30 rounded-xl p-4 mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <span>📋</span>
+                <span>合约地址</span>
+            </div>
+            <div class="text-gray-300 text-sm font-mono break-all bg-gray-900/50 p-3 rounded-lg">
+                {coin.get("contract", "N/A")}
+            </div>
+        </div>
+        
+        <!-- 项目故事 -->
+        <div class="bg-gray-800/30 rounded-xl p-4 mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <span>📖</span>
+                <span>项目故事</span>
+            </div>
+            <p class="text-gray-300 text-sm leading-relaxed">{coin.get("story", "暂无故事")}</p>
+        </div>
+        
+        <!-- 核心叙事 -->
+        <div class="bg-purple-500/10 rounded-xl p-4 mb-6 border border-purple-500/30">
+            <div class="text-xs text-purple-300 mb-2 flex items-center gap-2">
+                <span>💭</span>
+                <span>核心叙事</span>
+            </div>
+            <p class="text-gray-200 text-sm font-medium">{coin.get("narrative", "无")}</p>
+        </div>
+        
+        <!-- X平台信息 -->
+        <div class="bg-gray-800/30 rounded-xl p-4 mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-4 flex items-center gap-2">
+                <span>🐦</span>
+                <span>X平台信息</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <div class="text-xs text-gray-500 mb-1">官方账号</div>
+                    <a href="{coin.get('x_community_url', '#')}" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm font-medium">
+                        {coin.get('x_official_account', 'N/A')}
+                    </a>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500 mb-1">社区讨论</div>
+                    <a href="{coin.get('x_community_url', '#')}" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm">
+                        查看讨论 <span>→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 双栏内容 -->
+        <div class="grid grid-cols-2 gap-6">
+            <!-- X平台帖子 -->
+            <div class="bg-gray-800/30 rounded-xl p-4 border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-4 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <span>🐦</span>
+                        <span>X平台热门帖子</span>
+                    </span>
+                    <a href="{x_community}" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs">
+                        查看更多 →
+                    </a>
+                </div>
+                <div class="space-y-4">
+                    {x_posts_html if x_posts_html else '<div class="text-gray-500 text-sm text-center py-4">暂无热门帖子</div>'}
+                </div>
+            </div>
+            
+            <!-- 新闻 + 高频关键词 -->
+            <div class="space-y-4">
+                <div class="bg-gray-800/30 rounded-xl p-4 border border-gray-700/50">
+                    <div class="text-xs text-gray-400 mb-3 flex items-center gap-2">
+                        <span>📰</span>
+                        <span>相关新闻</span>
+                    </div>
+                    <div class="space-y-2">
+                        {news_html if news_html else '<div class="text-gray-500 text-sm text-center py-4">暂无新闻</div>'}
+                    </div>
+                </div>
+                
+                <!-- 高频关键词 -->
+                <div class="bg-gray-800/30 rounded-xl p-4 border border-gray-700/50">
+                    <div class="text-xs text-gray-400 mb-3 flex items-center gap-2">
+                        <span>🔤</span>
+                        <span>高频讨论关键词</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        {keywords_html if keywords_html else '<div class="text-gray-500 text-sm">暂无数据</div>'}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    '''
+
+def generate_html(meme_coins, mainstream_coins):
+    """生成完整信息HTML页面"""
+    
     update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    meme_avg = round(sum(t['score'] for t in meme_coins) / len(meme_coins), 1) if meme_coins else 0
+    mainstream_avg = round(sum(t['score'] for t in mainstream_coins) / len(mainstream_coins), 1) if mainstream_coins else 0
     
-    html_template = f"""<!DOCTYPE html>
+    # 生成详情卡片
+    meme_cards = ''.join([generate_coin_detail(coin, is_meme=True) for coin in meme_coins])
+    mainstream_cards = ''.join([generate_coin_detail(coin, is_meme=False) for coin in mainstream_coins])
+    
+    html = f'''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 Crypto Monitoring - 加密货币监控系统</title>
+    <title>Crypto Monitoring — 加密货币热点监控</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }}
-        
         body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
+        }}
+        .gradient-text {{
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }}
-        
-        .container {{
-            max-width: 1400px;
-            margin: 0 auto;
+        .glass {{
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border:1px solid rgba(255, 255, 255, 0.1);
         }}
-        
-        header {{
-            text-align: center;
-            color: white;
-            padding: 40px 20px;
-            margin-bottom: 30px;
-        }}
-        
-        header h1 {{
-            font-size: 3em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }}
-        
-        header p {{
-            font-size: 1.2em;
-            opacity: 0.9;
-        }}
-        
-        .update-time {{
-            background: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 15px;
-            font-size: 0.9em;
-        }}
-        
-        .section {{
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }}
-        
-        .section-title {{
-            font-size: 2em;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }}
-        
-        .stats {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }}
-        
-        .stat-card {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }}
-        
-        .stat-card h3 {{
-            font-size: 0.9em;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }}
-        
-        .stat-card .value {{
-            font-size: 2em;
-            font-weight: bold;
-        }}
-        
-        table {{
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }}
-        
-        th {{
-            background: #667eea;
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: bold;
-        }}
-        
-        td {{
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }}
-        
-        tr:hover {{
-            background: #f8f9ff;
-        }}
-        
-        .score {{
-            font-weight: bold;
-            font-size: 1.1em;
-        }}
-        
-        .score.high {{
-            color: #10b981;
-        }}
-        
-        .score.medium {{
-            color: #f59e0b;
-        }}
-        
-        .score.low {{
-            color: #ef4444;
-        }}
-        
-        .rating {{
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: bold;
-        }}
-        
-        .rating.high {{
-            background: #d1fae5;
-            color: #065f46;
-        }}
-        
-        .rating.medium {{
-            background: #fef3c7;
-            color: #92400e;
-        }}
-        
-        .rating.low {{
-            background: #fee2e2;
-            color: #991b1b;
-        }}
-        
-        .growth {{
-            color: #10b981;
-            font-weight: bold;
-        }}
-        
-        .growth.negative {{
-            color: #ef4444;
-        }}
-        
-        .category-badge {{
-            display: inline-block;
-            padding: 4px 10px;
-            background: #e0e7ff;
-            color: #4338ca;
-            border-radius: 12px;
-            font-size: 0.85em;
-        }}
-        
-        footer {{
-            text-align: center;
-            color: white;
-            padding: 30px 20px;
-            margin-top: 30px;
-        }}
-        
-        .warning {{
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #ef4444;
-        }}
-        
-        @media (max-width: 768px) {{
-            header h1 {{
-                font-size: 2em;
-            }}
-            
-            .section {{
-                padding: 15px;
-            }}
-            
-            th, td {{
-                padding: 10px;
-                font-size: 0.9em;
-            }}
-            
-            table {{
-                display: block;
-                overflow-x: auto;
-            }}
+        .glow {{
+            box-shadow: 0 0 40px rgba(102, 126, 234, 0.3);
         }}
     </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>🚀 Crypto Monitoring</h1>
-            <p>加密货币实时监控和分析系统</p>
-            <div class="update-time">⏰ 最后更新: {update_time} (UTC+8)</div>
-        </header>
-        
-        <div class="section">
-            <div class="warning">
-                <strong>⚠️ 风险提示：</strong>Meme币投资风险极高，可能导致本金全部损失。本报告仅供参考，不构成投资建议。请务必DYOR（自己做研究）！
-            </div>
-        </div>
-        
-        <div class="section">
-            <h2 class="section-title">💎 主流货币板块</h2>
-            <p style="color: #666; margin-bottom: 15px;">稳定、成熟的加密货币项目（AI、DeFi、基础设施等强叙事，评分≥60，市值≥$50K）</p>
-            
-            <div class="stats">
-                <div class="stat-card">
-                    <h3>总数量</h3>
-                    <div class="value">{len(mainstream_tokens)}</div>
+<body class="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 min-h-screen text-gray-100">
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-gray-900/50 backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-2xl glow">
+                        🚀
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold gradient-text">Crypto Monitoring</h1>
+                        <p class="text-sm text-gray-400 mt-0.5">加密货币热点监控系统</p>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3>高评分项目</h3>
-                    <div class="value">{len([t for t in mainstream_tokens if t['score'] >= 80])}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>平均评分</h3>
-                    <div class="value">{sum(t['score'] for t in mainstream_tokens) / len(mainstream_tokens):.1f}</div>
+                <div class="flex items-center gap-4">
+                    <div class="glass rounded-lg px-4 py-2 flex items-center gap-2">
+                        <span class="text-yellow-400">●</span>
+                        <span class="text-sm text-gray-300">实时更新</span>
+                    </div>
+                    <div class="glass rounded-lg px-4 py-2 text-sm text-gray-300">
+                        更新于 {update_time}
+                    </div>
                 </div>
             </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>排名</th>
-                        <th>代币</th>
-                        <th>市值</th>
-                        <th>增长率</th>
-                        <th>评分</th>
-                        <th>评级</th>
-                        <th>分类</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {generate_token_rows(mainstream_tokens)}
-                </tbody>
-            </table>
         </div>
-        
-        <div class="section">
-            <h2 class="section-title">🎲 Meme币板块</h2>
-            <p style="color: #666; margin-bottom: 15px;">pump.fun和X平台热门讨论的高潜力早期项目（强叙事+强社区推动，不限市值）</p>
-            
-            <div class="stats">
-                <div class="stat-card">
-                    <h3>总数量</h3>
-                    <div class="value">{len(meme_tokens)}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>高评分项目</h3>
-                    <div class="value">{len([t for t in meme_tokens if t['score'] >= 80])}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>平均评分</h3>
-                    <div class="value">{sum(t['score'] for t in meme_tokens) / len(meme_tokens):.1f}</div>
-                </div>
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>排名</th>
-                        <th>代币</th>
-                        <th>市值</th>
-                        <th>增长率</th>
-                        <th>评分</th>
-                        <th>评级</th>
-                        <th>分类</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {generate_token_rows(meme_tokens)}
-                </tbody>
-            </table>
-        </div>
-        
-        <footer>
-            <p>🔗 <a href="https://github.com/lm16688/Crypto-Monitoring" style="color: white; text-decoration: underline;">GitHub仓库</a> | ⏱️ 每小时自动更新</p>
-            <p style="margin-top: 10px; opacity: 0.8;">使用 ❤️ 和 AI Agent 构建</p>
-        </footer>
-    </div>
-</body>
-</html>"""
-    
-    return html_template
+    </header>
 
-def generate_token_rows(tokens):
-    """生成表格行"""
-    if not tokens:
-        return '<tr><td colspan="7" style="text-align: center; padding: 30px;">暂无数据</td></tr>'
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Hero Stats -->
+        <div class="grid grid-cols-4 gap-4 mb-8">
+            <div class="glass rounded-2xl p-6 glow">
+                <div class="text-xs text-gray-400 mb-2">Meme币总数</div>
+                <div class="text-4xl font-bold text-white">{len(meme_coins)}</div>
+                <div class="text-xs text-gray-400 mt-1">pump.fun热门项目</div>
+            </div>
+            <div class="glass rounded-2xl p-6">
+                <div class="text-xs text-gray-400 mb-2">主流币总数</div>
+                <div class="text-4xl font-bold text-white">{len(mainstream_coins)}</div>
+                <div class="text-xs text-gray-400 mt-1">BTC/ETH/SOL等</div>
+            </div>
+            <div class="glass rounded-2xl p-6">
+                <div class="text-xs text-gray-400 mb-2">高评分项目</div>
+                <div class="text-4xl font-bold text-green-400">{len([t for t in meme_coins + mainstream_coins if t['score'] >= 80])}</div>
+                <div class="text-xs text-gray-400 mt-1">评分 ≥ 80</div>
+            </div>
+            <div class="glass rounded-2xl p-6">
+                <div class="text-xs text-gray-400 mb-2">平均评分</div>
+                <div class="text-4xl font-bold text-purple-400">{(meme_avg + mainstream_avg) / 2:.1f}</div>
+                <div class="text-xs text-gray-400 mt-1">综合评分</div>
+            </div>
+        </div>
+
+        <!-- Data Sources -->
+        <div class="glass rounded-2xl p-4 mb-8 flex items-center justify-between">
+            <div class="flex items-center gap-6 text-sm text-gray-400">
+                <span class="flex items-center gap-2">
+                    <span class="text-blue-400">●</span>
+                    CoinGecko
+                </span>
+                <span class="flex items-center gap-2">
+                    <span class="text-purple-400">●</span>
+                    X Platform
+                </span>
+                <span class="flex items-center gap-2">
+                    <span class="text-green-400">●</span>
+                    NewsAPI
+                </span>
+                <span class="flex items-center gap-2">
+                    <span class="text-yellow-400">●</span>
+                    pump.fun
+                </span>
+            </div>
+            <div class="text-xs text-gray-500">
+                ⚠️ 仅供参考，不构成投资建议
+            </div>
+        </div>
+
+        <!-- Meme Coins Section -->
+        <section class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <h2 class="text-3xl font-bold text-white">🎲 Meme币板块</h2>
+                <span class="glass rounded-full px-4 py-2 text-sm text-gray-300">{len(meme_coins)} 个</span>
+            </div>
+            <p class="text-gray-400 mb-8 text-lg">pump.fun和X平台热门讨论的高潜力早期项目（强叙事+强社区推动，不限市值）</p>
+            
+            <div class="grid grid-cols-1 gap-6">
+                {meme_cards}
+            </div>
+        </section>
+
+        <!-- Mainstream Coins Section -->
+        <section>
+            <div class="flex items-center gap-3 mb-6">
+                <h2 class="text-3xl font-bold text-white">💎 主流币板块</h2>
+                <span class="glass rounded-full px-4 py-2 text-sm text-gray-300">"{str(len(mainstream_coins))} 个"</span>
+            </div>
+            <p class="text-gray-400 mb-8 text-lg">BTC/ETH/SOL/TAO/K等知名主流加密货币</p>
+            
+            <div class="grid grid-cols-1 gap-6">
+                {mainstream_cards}
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-16">
+        <div class="max-w-7xl mx-auto px px-6 py-8">
+            <div class="flex items-center justify-between mb-4">
+                <div class="text-sm text-gray-400">
+                    数据来源：CoinGecko · X Platform · NewsAPI · pump.fun
+                </div>
+                <div class="text-sm text-gray-400">
+                    ⚠️ 仅供参考，不构成投资建议
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-500">
+                    © 2025 Crypto Monitoring · 每小时自动更新
+                </div>
+                <a href="https://github.com/lm16688/Crypto-Monitoring" class="text-purple-400 hover:text-purple-300 text-sm">
+                    GitHub 仓库
+                </a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>'''
     
-    rows = []
-    
-    for token in tokens:
-        # 评分样式
-        score_class = 'high' if token['score'] >= 80 else 'medium' if token['score'] >= 60 else 'low'
-        
-        # 评级样式
-        rating_class = 'high' if '重点' in token['rating'] else 'medium' if '值得' in token['rating'] else 'low'
-        
-        # 增长率样式
-        growth_class = 'negative' if token['growth_rate'] < 0 else ''
-        
-        # 市值格式化
-        market_cap = token['market_cap']
-        if market_cap >= 1000000:
-            market_cap_str = f"${market_cap/1000000:.2f}M"
-        elif market_cap >= 1000:
-            market_cap_str = f"${market_cap/1000:.1f}K"
-        else:
-            market_cap_str = f"${market_cap:,.0f}"
-        
-        row = f"""
-        <tr>
-            <td><strong>#{token['rank']}</strong></td>
-            <td><strong>{token['symbol']}</strong></td>
-            <td>{market_cap_str}</td>
-            <td class="growth {growth_class}">{token['growth_rate']:+.2f}%</td>
-            <td class="score {score_class}">{token['score']}/100</td>
-            <td><span class="rating {rating_class}">{token['rating']}</span></td>
-            <td><span class="category-badge">{token['category']}</span></td>
-        </tr>
-        """
-        
-        rows.append(row)
-    
-    return '\n'.join(rows)
+    return html
 
 def main():
     """主函数"""
-    print("📊 开始生成HTML报告...")
+    meme_coins, mainstream_coins = run_monitor_and_get_data()
     
-    # 创建docs目录
     docs_dir = Path(__file__).parent / 'docs'
     docs_dir.mkdir(exist_ok=True)
     
-    # 提取数据
-    tokens = extract_latest_report_from_readme()
+    print(f"✅ Meme币: {len(meme_coins)} 个")
+    print(f"✅ 主流币: {len(mainstream_coins)} 个")
     
-    if not tokens:
-        print("⚠️  未找到代币数据，生成空报告")
-    else:
-        print(f"✅ 找到 {len(tokens)} 个代币")
-    
-    # 生成HTML
-    html_content = generate_html(tokens)
-    
-    # 保存HTML
+    html_content = generate_html(meme_coins, mainstream_coins)
     html_path = docs_dir / 'index.html'
     
     with open(html_path, 'w', encoding='utf-8') as f:
         f.write(html_content)
     
     print(f"✅ HTML报告已生成: {html_path}")
-    print(f"📊 主流货币: {len([t for t in tokens if t['is_mainstream']])} 个")
-    print(f"🎲 Meme币: {len([t for t in tokens if not t['is_mainstream']])} 个")
+    print(f"🌐 访问: https://lm16688.github.io/Crypto-Monitoring/")
 
 if __name__ == '__main__':
     main()
