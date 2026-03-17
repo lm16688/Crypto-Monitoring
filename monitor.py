@@ -278,7 +278,7 @@ class MemeCoinMonitor:
 
     def save_report(self, report: str):
         """保存报告"""
-        filename = f"crypto-monitor/report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        filename = f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(report)
         print(f"✅ 报告已保存: {filename}")
