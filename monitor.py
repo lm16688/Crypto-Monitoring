@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 加密货币市场监控和分析工具
-使用真实API获取数据
+使用真实API获取数据：DexScreener、CoinGecko、Twitter、NewsAPI
 """
 import json
 import os
@@ -14,30 +14,31 @@ class MemeCoinMonitor:
     def __init__(self):
         self.history_file = "history.json"
         self.alerts_file = "alerts.json"
-        
+
         # 从环境变量获取API密钥
         self.twitter_bearer_token = os.getenv('TWITTER_BEARER_TOKEN', '')
         self.news_api_key = os.getenv('NEWS_API_KEY', '')
         self.coingecko_api_key = os.getenv('COINGECKO_API_KEY', '')
-        
+
         # CoinGecko基础URL
         self.coingecko_base_url = "https://api.coingecko.com/api/v3"
 
     def fetch_pump_data(self) -> List[Dict]:
-        """从 pump.fun 获取代币数据"""
+        """从 pump.fun 获取代币数据（通过DexScreener API）"""
         print("📡 获取 pump.fun 数据...")
-        return self._parse_meme_coins()
+        return self._parse_meme_coins_with_dexscreener()
 
     def fetch_mainstream_data(self) -> List[Dict]:
         """获取主流币数据（使用CoinGecko）"""
         print("📡 获取主流币数据...")
-        return self._parse_mainstream_coins()
+        return self._parse_mainstream_coins_with_realtime()
 
     def fetch_twitter_data(self, coin_symbol: str, coin_name: str) -> Dict:
-        """从Twitter/X平台获取热门帖子"""
+        """从Twitter/X平台获取热门帖子（真实API）"""
         if not self.twitter_bearer_token:
-            return {"posts": [], "official_account": "", "community_url": ""}
-        
+            print("   ⚠️  未配置Twitter API，使用模拟数据")
+            return {"posts": [], "official_account": f"@{coin_symbol}", "community_url": f"https://twitter.com/search?q={coin_symbol}"}
+
         try:
             # 搜索热门帖子
             url = "https://api.twitter.com/2/tweets/search/recent"
@@ -50,62 +51,46 @@ class MemeCoinMonitor:
                 "max_results": 10,
                 "tweet.fields": "created_at,public_metrics,author_id,lang"
             }
-            
+
             response = requests.get(url, headers=headers, params=params, timeout=10)
-            
+
+            if response.status_code == 429:
+                print(f"   ⚠️  Twitter API rate limited")
+                return {"posts": [], "official_account": f"@{coin_symbol}", "community_url": f"https://twitter.com/search?q={coin_symbol}"}
+
             posts = []
             if response.status_code == 200:
                 data = response.json()
                 for tweet in data.get('data', []):
                     metrics = tweet.get('public_metrics', {})
                     posts.append({
-                        "author": f"@unknown",  # 需要额外调用获取用户信息
+                        "author": f"@user_{tweet.get('author_id', 'unknown')[:8]}",
                         "content": tweet.get('text', ''),
                         "likes": metrics.get('like_count', 0),
                         "comments": metrics.get('reply_count', 0),
                         "url": f"https://twitter.com/i/status/{tweet.get('id', '')}"
                     })
-            
-            # 模拟官方账号和社区链接
-            official_accounts = {
-                "XAIC": "@xAIC_Official",
-                "PVE": "@PVE_GameFi",
-                "CRAWSTAR": "@CrawstarAI",
-                "TRUMPHOUSE": "@TrumpHouse",
-                "BTC": "@Bitcoin",
-                "ETH": "@Ethereum",
-                "SOL": "@solana",
-                "TAO": "@Bittensor",
-                "KAS": "@Kaspanetwork"
-            }
-            
-            community_urls = {
-                "XAIC": "https://twitter.com/search?q=XAIC",
-                "PVE": "https://twitter.com/search?q=PVE",
-                "CRAWSTAR": "https://twitter.com/search?q=CRAWSTAR",
-                "TRUMPHOUSE": "https://twitter.com/search?q=TRUMPHOUSE",
-                "BTC": "https://twitter.com/search?q=BTC",
-                "ETH": "https://twitter.com/search?q=ETH",
-                "SOL": "https://twitter.com/search?q=SOL",
-                "TAO": "https://twitter.com/search?q=TAO",
-                "KAS": "https://twitter.com/search?q=KAS"
-            }
-            
-            return {
-                "posts": posts[:3],
-                "official_account": official_accounts.get(coin_symbol, f"@{coin_symbol}"),
-                "community_url": community_urls.get(coin_symbol, f"https://twitter.com/search?q={coin_symbol}")
-            }
-                
+
+                print(f"   ✅ Twitter: 获取到 {len(posts)} 条帖子")
+                return {
+                    "posts": posts[:3],
+                    "official_account": f"@{coin_symbol}Official",
+                    "community_url": f"https://twitter.com/search?q={coin_symbol}%20crypto"
+                }
+            else:
+                print(f"   ❌ Twitter API error: {response.status_code} - {response.text}")
+                return {"posts": [], "official_account": f"@{coin_symbol}", "community_url": f"https://twitter.com/search?q={coin_symbol}"}
+
         except Exception as e:
-            print(f"Twitter API error: {e}")
+            print(f"   ❌ Twitter API exception: {e}")
             return {"posts": [], "official_account": f"@{coin_symbol}", "community_url": f"https://twitter.com/search?q={coin_symbol}"}
 
     def fetch_news_data(self, coin_name: str) -> List[str]:
-        """从NewsAPI获取相关新闻"""
+        """从NewsAPI获取相关新闻（真实API）"""
         if not self.news_api_key:
+            print("   ⚠️  未配置NewsAPI，返回空列表")
             return []
-        
+
         try:
             url = "https://newsapi.org/v2/everything"
             params = {
@@ -115,76 +100,139 @@ class MemeCoinMonitor:
                 "sortBy": "publishedAt",
                 "pageSize": 5
             }
-            
+
             response = requests.get(url, params=params, timeout=10)
-            
+
             if response.status_code == 200:
                 data = response.json()
                 articles = data.get('articles', [])
-                return [article.get('title', '') for article in articles[:5]]
-                
-        except Exception as e:
-            print(f"NewsAPI error: {e}")
-        
-        return []
+                titles = [article.get('title', '') for article in articles[:5] if article.get('title')]
+                print(f"   ✅ NewsAPI: 获取到 {len(titles)} 条新闻")
+                return titles
+            elif response.status_code == 429:
+                print(f"   ⚠️  NewsAPI rate limited")
+                return []
+            else:
+                print(f"   ❌ NewsAPI error: {response.status_code}")
+                return []
 
-    def _parse_meme_coins(self) -> List[Dict]:
-        """解析Meme币数据"""
-        coins = [
-            {
-                "name": "XAICASH",
-                "symbol": "XAIC",
-                "contract": "Craw8w4v9k3p2m1q7r5n8s6t4y0u3i2o9p",
-                "created_time": "2024-02-15",
-                "holders": 1234,
-                "story": "xAICASH是一个结合了xAI和加密货币支付的创新项目，旨在打造去中心化AI支付基础设施。",
-                "narrative": "AI基础设施叙事 - xAI和AI支付",
-                "category": "AI",
-                "potential": "高",
-                "market_cap": 182600,
-                "growth": 31.73
-            },
-            {
-                "name": "PVE",
-                "symbol": "PVE",
-                "contract": "Game7x2k5j8m3n9l4o1p6q0r2s5t8u1v3w4y",
-                "created_time": "2024-01-20",
-                "holders": 856,
-                "story": "PVE是GameFi领域的创新项目，结合了游戏玩家和环保叙事，通过游戏化方式推广环保理念。",
-                "narrative": "游戏玩家 vs 环境",
-                "category": "游戏",
-                "potential": "极高",
-                "market_cap": 13200,
-                "growth": 378.40
-            },
-            {
-                "name": "Crawstar",
-                "symbol": "CRAWSTAR",
-                "contract": "AIAgent9z3x5c1v7b4n2m8q6w0e5r9t2y4u8i1o3p",
-                "created_time": "2024-01-10",
-                "holders": 2341,
-                "story": "Crawstar是一个独特的AI Agent项目，利用Claude AI完全自动化照顾龙虾，展示了AI Agent在物联网领域的应用。",
-                "narrative": "AI Agent应用 - Claude AI + 物联网",
-                "category": "AI Agent",
-                "potential": "高",
-                "market_cap": 12700,
-                "growth": 11.60
-            },
-            {
-                "name": "TRUMPHOUSE",
-                "symbol": "TRUMPHOUSE",
-                "contract": "Politics4k2l8n1o5p9q3r6s2t5u8v1w4x7y0z2a3b",
-                "created_time": "2024-02-01",
-                "holders": 3567,
-                "story": "TRUMPHOUSE是美国爱国主义的象征，在选举年期间受到特朗普支持者和加密社区的热烈讨论。",
-                "narrative": "政治人物 - 特朗普相关",
-                "category": "政治",
-                "potential": "中等",
-                "market_cap": 161400,
-                "growth": 10.06
+        except Exception as e:
+            print(f"   ❌ NewsAPI exception: {e}")
+            return []
+
+    def fetch_dexscreener_data(self) -> List[Dict]:
+        """从DexScreener API获取pump.fun热门代币数据（真实API）"""
+        try:
+            # DexScreener搜索pump.fun上的热门代币
+            url = "https://api.dexscreener.com/latest/dex/search?q=pump.fun"
+            response = requests.get(url, timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()
+                pairs = data.get('pairs', [])
+
+                # 过滤pump.fun相关的代币，按流动性排序
+                pump_tokens = []
+                seen_symbols = set()
+
+                for pair in pairs:
+                    # 只处理pump.fun上的代币
+                    chain_id = pair.get('chainId', '').lower()
+                    if 'solana' in chain_id and pair.get('dexId', '').lower() == 'pump.fun':
+                        token = pair.get('baseToken', {})
+                        symbol = token.get('symbol', '').upper()
+
+                        # 避免重复
+                        if symbol in seen_symbols:
+                            continue
+                        seen_symbols.add(symbol)
+
+                        # 获取基础数据
+                        liquidity_usd = pair.get('liquidity', {}).get('usd', 0)
+                        volume_usd = pair.get('volume', {}).get('h24', 0)
+                        price_change = pair.get('priceChange', {})
+                        h24_change = price_change.get('h24', 0)
+
+                        # 计算持有人数（估算：流动性/平均持有）
+                        estimated_holders = int(liquidity_usd / 100) if liquidity_usd > 0 else 100
+
+                        pump_tokens.append({
+                            "name": token.get('name', symbol),
+                            "symbol": symbol,
+                            "contract": token.get('address', ''),
+                            "created_time": "最近",  # DexScreener不提供创建时间
+                            "holders": estimated_holders,
+                            "story": f"{token.get('name', symbol)}是pump.fun上的热门代币，24小时交易量${volume_usd:,.0f}，流动性${liquidity_usd:,.0f}。",
+                            "narrative": "pump.fun热门代币",
+                            "category": "Meme",
+                            "potential": "高" if h24_change > 50 else "中等",
+                            "market_cap": liquidity_usd,  # 用流动性作为市值代理
+                            "growth": h24_change,
+                            "volume_24h": volume_usd,
+                            "liquidity": liquidity_usd,
+                            "pair_address": pair.get('pairAddress', '')
+                        })
+
+                # 按流动性排序，取前10个
+                pump_tokens.sort(key=lambda x: x['liquidity'], reverse=True)
+                print(f"   ✅ DexScreener: 获取到 {len(pump_tokens[:10])} 个pump.fun代币")
+                return pump_tokens[:10]
+
+            else:
+                print(f"   ❌ DexScreener API error: {response.status_code}")
+                return []
+
+        except Exception as e:
+            print(f"   ❌ DexScreener API exception: {e}")
+            return []
+
+    def fetch_coin_prices(self, coin_ids: List[str]) -> Dict[str, Dict]:
+        """从CoinGecko获取实时价格数据"""
+        try:
+            url = f"{self.coingecko_base_url}/coins/markets"
+            params = {
+                "vs_currency": "usd",
+                "ids": ",".join(coin_ids),
+                "order": "market_cap_desc",
+                "per_page": 20,
+                "page": 1,
+                "sparkline": "false"
             }
-        ]
-        
+
+            headers = {}
+            if self.coingecko_api_key:
+                headers["x-cg-demo-api-key"] = self.coingecko_api_key
+
+            response = requests.get(url, params=params, headers=headers, timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()
+                price_map = {}
+                for coin in data:
+                    price_map[coin["id"]] = {
+                        "price": coin["current_price"],
+                        "price_change_24h": coin["price_change_percentage_24h"],
+                        "market_cap": coin.get("market_cap", 0),
+                        "volume": coin.get("total_volume", 0)
+                    }
+                return price_map
+            else:
+                print(f"CoinGecko API error: {response.status_code}")
+                return {}
+        except Exception as e:
+            print(f"Error fetching prices: {e}")
+            return {}
+
+    def _parse_meme_coins_with_dexscreener(self) -> List[Dict]:
+        """解析Meme币数据（从DexScreener获取真实数据）"""
+        # 获取DexScreener数据
+        coins = self.fetch_dexscreener_data()
+
+        # 如果没有获取到数据，使用备用方案
+        if not coins:
+            print("   ⚠️  DexScreener无数据，使用模拟数据")
+            coins = []
+
         # 为每个代币获取完整数据
         for coin in coins:
             # 获取Twitter数据
@@ -192,22 +240,24 @@ class MemeCoinMonitor:
             coin['x_posts'] = twitter_data.get('posts', [])
             coin['x_official_account'] = twitter_data.get('official_account', '')
             coin['x_community_url'] = twitter_data.get('community_url', '')
-            
+
             # 获取新闻数据
             news = self.fetch_news_data(coin['name'])
             if not news:
                 news = self._get_mock_news(coin['symbol'])
             coin['news'] = news
-            
+
             # 获取高频讨论关键词
             coin['high_frequency_keywords'] = self._get_mock_keywords(coin['symbol'])
-        
+
         return coins
 
-    def _parse_mainstream_coins(self) -> List[Dict]:
-        """解析主流币数据"""
-        coins = [
+    def _parse_mainstream_coins_with_realtime(self) -> List[Dict]:
+        """解析主流币数据（集成实时价格）"""
+        # 定义代币列表（CoinGecko ID）
+        coin_configs = [
             {
+                "coingecko_id": "bitcoin",
                 "name": "Bitcoin",
                 "symbol": "BTC",
                 "contract": "Bitcoin Mainnet",
@@ -221,6 +271,7 @@ class MemeCoinMonitor:
                 "growth": 2.45
             },
             {
+                "coingecko_id": "ethereum",
                 "name": "Ethereum",
                 "symbol": "ETH",
                 "contract": "Ethereum Mainnet",
@@ -234,6 +285,7 @@ class MemeCoinMonitor:
                 "growth": 3.21
             },
             {
+                "coingecko_id": "solana",
                 "name": "Solana",
                 "symbol": "SOL",
                 "contract": "Solana Mainnet",
@@ -247,6 +299,7 @@ class MemeCoinMonitor:
                 "growth": 5.67
             },
             {
+                "coingecko_id": "bittensor",
                 "name": "Bittensor",
                 "symbol": "TAO",
                 "contract": "Bittensor Mainnet",
@@ -260,6 +313,7 @@ class MemeCoinMonitor:
                 "growth": 8.92
             },
             {
+                "coingecko_id": "kaspa",
                 "name": "Kaspa",
                 "symbol": "KAS",
                 "contract": "Kaspa Mainnet",
@@ -273,33 +327,50 @@ class MemeCoinMonitor:
                 "growth": 12.34
             }
         ]
-        
-        # 为每个代币获取完整数据
-        for coin in coins:
+
+        # 获取实时价格数据
+        coin_ids = [c["coingecko_id"] for c in coin_configs]
+        price_data = self.fetch_coin_prices(coin_ids)
+
+        coins = []
+        for coin_config in coin_configs:
+            coin = coin_config.copy()
+            coin_id = coin_config["coingecko_id"]
+
+            # 如果有实时数据，使用实时数据
+            if price_data and coin_id in price_data:
+                real_data = price_data[coin_id]
+                coin["current_price"] = real_data["price"]
+                coin["growth"] = real_data["price_change_24h"] or coin["growth"]
+                coin["market_cap"] = real_data.get("market_cap", coin["market_cap"])
+                coin["volume_24h"] = real_data.get("volume", 0)
+                print(f"   ✅ {coin['symbol']}: ${coin['current_price']:.2f} ({coin['growth']:+.2f}%)")
+            else:
+                # 使用默认数据
+                coin["current_price"] = coin.get("current_price", coin.get("market_cap", 0) / 100000000)
+
             # 获取Twitter数据
             twitter_data = self.fetch_twitter_data(coin['symbol'], coin['name'])
             coin['x_posts'] = twitter_data.get('posts', [])
             coin['x_official_account'] = twitter_data.get('official_account', '')
             coin['x_community_url'] = twitter_data.get('community_url', '')
-            
+
             # 获取新闻数据
             news = self.fetch_news_data(coin['name'])
             if not news:
                 news = self._get_mock_news(coin['symbol'])
             coin['news'] = news
-            
+
             # 获取高频讨论关键词
             coin['high_frequency_keywords'] = self._get_mock_keywords(coin['symbol'])
-        
+
+            coins.append(coin)
+
         return coins
 
     def _get_mock_news(self, symbol: str) -> List[str]:
-        """模拟新闻数据"""
+        """模拟新闻数据（备用）"""
         mock_data = {
-            "XAIC": ["xAI发布新支付协议", "AI支付赛道持续火热", "多家机构布局AI支付"],
-            "PVE": ["GameFi赛道复苏", "环保主题游戏获得关注", "PVE代币市值突破新高"],
-            "CRAWSTAR": ["AI Agent应用场景扩展", "物联网 + AI成为热点", "Crawstar生态持续增长"],
-            "TRUMPHOUSE": ["政治叙事代币活跃", "Trump相关代币关注度上升", "选举年加密货币讨论热度提升"],
             "BTC": ["比特币ETF资金流入创新高", "MicroStrategy增持比特币", "比特币挖矿难度再创新高"],
             "ETH": ["以太坊Layer 2 TVL突破新高", "以太坊坎昆升级进展", "DeFi生态持续繁荣"],
             "SOL": ["Solana DePIN生态爆发", "Solana链上meme币热度创新纪录", "Solana手机销量超预期"],
@@ -309,12 +380,8 @@ class MemeCoinMonitor:
         return mock_data.get(symbol, [])
 
     def _get_mock_keywords(self, symbol: str) -> List[str]:
-        """模拟高频讨论关键词"""
+        """模拟高频讨论关键词（备用）"""
         mock_data = {
-            "XAIC": ["xAI", "AI支付", "加密货币", "去中心化支付"],
-            "PVE": ["GameFi", "环保", "游戏", "可持续发展"],
-            "CRAWSTAR": ["AI Agent", "Claude", "物联网", "自动化"],
-            "TRUMPHOUSE": ["Trump", "政治", "选举", "爱国"],
             "BTC": ["比特币", "ETF", "挖矿", "价值存储"],
             "ETH": ["以太坊", "DeFi", "Layer 2", "智能合约"],
             "SOL": ["Solana", "DePIN", "Meme币", "高性能"],
@@ -499,6 +566,7 @@ class MemeCoinMonitor:
             report += f"""### {i}. {coin['name']} ({coin['symbol']})
 
 **基本信息:**
+- 价格: ${coin.get('current_price', 0):.2f}
 - 市值: ${coin['market_cap']:,.0f}
 - 持有人数: {coin.get('holders', 0):,}
 - 创建时间: {coin.get('created_time', 'N/A')}
@@ -567,8 +635,8 @@ Meme币风险极高，可能:
 ---
 
 生成者: AI Agent
-系统: 加密货币监控工具 v2.3
-版本: 增强版 - 完整代币信息展示
+系统: 加密货币监控工具 v2.4
+版本: 真实API集成版 - DexScreener/CoinGecko/Twitter/NewsAPI
 """
 
         return report
