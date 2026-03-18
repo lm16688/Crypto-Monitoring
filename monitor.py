@@ -85,8 +85,8 @@ class MemeCoinMonitor:
             print(f"   ❌ Twitter API exception: {e}")
             return {"posts": [], "official_account": f"@{coin_symbol}", "community_url": f"https://twitter.com/search?q={coin_symbol}"}
 
-    def fetch_news_data(self, coin_name: str) -> List[str]:
-        """从NewsAPI获取相关新闻（真实API）"""
+    def fetch_news_data(self, coin_name: str) -> List[Dict]:
+        """从NewsAPI获取相关新闻（真实API）- 返回包含标题和URL的字典列表"""
         if not self.news_api_key:
             print("   ⚠️  未配置NewsAPI，返回空列表")
             return []
@@ -106,9 +106,18 @@ class MemeCoinMonitor:
             if response.status_code == 200:
                 data = response.json()
                 articles = data.get('articles', [])
-                titles = [article.get('title', '') for article in articles[:5] if article.get('title')]
-                print(f"   ✅ NewsAPI: 获取到 {len(titles)} 条新闻")
-                return titles
+                # 返回包含标题和URL的字典列表
+                news_list = []
+                for article in articles[:5]:
+                    if article.get('title'):
+                        news_list.append({
+                            "title": article.get('title', ''),
+                            "url": article.get('url', ''),
+                            "source": article.get('source', {}).get('name', ''),
+                            "publishedAt": article.get('publishedAt', '')
+                        })
+                print(f"   ✅ NewsAPI: 获取到 {len(news_list)} 条新闻")
+                return news_list
             elif response.status_code == 429:
                 print(f"   ⚠️  NewsAPI rate limited")
                 return []
@@ -130,6 +139,7 @@ class MemeCoinMonitor:
             if response.status_code == 200:
                 data = response.json()
                 pairs = data.get('pairs', [])
+                print(f"   🔍 DexScreener返回了 {len(pairs)} 个交易对")
 
                 # 过滤pump.fun相关的代币，按流动性排序
                 pump_tokens = []
@@ -244,7 +254,7 @@ class MemeCoinMonitor:
             # 获取新闻数据
             news = self.fetch_news_data(coin['name'])
             if not news:
-                news = self._get_mock_news(coin['symbol'])
+                news = self._get_mock_news_dict(coin['symbol'])
             coin['news'] = news
 
             # 获取高频讨论关键词
@@ -358,7 +368,7 @@ class MemeCoinMonitor:
             # 获取新闻数据
             news = self.fetch_news_data(coin['name'])
             if not news:
-                news = self._get_mock_news(coin['symbol'])
+                news = self._get_mock_news_dict(coin['symbol'])
             coin['news'] = news
 
             # 获取高频讨论关键词
@@ -368,14 +378,34 @@ class MemeCoinMonitor:
 
         return coins
 
-    def _get_mock_news(self, symbol: str) -> List[str]:
-        """模拟新闻数据（备用）"""
+    def _get_mock_news_dict(self, symbol: str) -> List[Dict]:
+        """模拟新闻数据（返回包含标题和URL的字典）"""
         mock_data = {
-            "BTC": ["比特币ETF资金流入创新高", "MicroStrategy增持比特币", "比特币挖矿难度再创新高"],
-            "ETH": ["以太坊Layer 2 TVL突破新高", "以太坊坎昆升级进展", "DeFi生态持续繁荣"],
-            "SOL": ["Solana DePIN生态爆发", "Solana链上meme币热度创新纪录", "Solana手机销量超预期"],
-            "TAO": ["Bittensor AI算力市场增长", "多个AI项目集成TAO网络", "去中心化AI受到关注"],
-            "KAS": ["Kaspa交易速度突破每秒10笔", "Kaspa社区扩容提案获得支持", "Kaspa技术优势明显"]
+            "BTC": [
+                {"title": "比特币ETF资金流入创新高", "url": "https://example.com/btc1", "source": "CryptoNews"},
+                {"title": "MicroStrategy增持比特币", "url": "https://example.com/btc2", "source": "Bloomberg"},
+                {"title": "比特币挖矿难度再创新高", "url": "https://example.com/btc3", "source": "Coindesk"}
+            ],
+            "ETH": [
+                {"title": "以太坊Layer 2 TVL突破新高", "url": "https://example.com/eth1", "source": "Decrypt"},
+                {"title": "以太坊坎昆升级进展", "url": "https://example.com/eth2", "source": "Ethereum Blog"},
+                {"title": "DeFi生态持续繁荣", "url": "https://example.com/eth3", "source": "DeFi Llama"}
+            ],
+            "SOL": [
+                {"title": "Solana DePIN生态爆发", "url": "https://example.com/sol1", "source": "The Block"},
+                {"title": "Solana链上meme币热度创新纪录", "url": "https://example.com/sol2", "source": "CoinDesk"},
+                {"title": "Solana手机销量超预期", "url": "https://example.com/sol3", "source": "TechCrunch"}
+            ],
+            "TAO": [
+                {"title": "Bittensor AI算力市场增长", "url": "https://example.com/tao1", "source": "AI News"},
+                {"title": "多个AI项目集成TAO网络", "url": "https://example.com/tao2", "source": "Medium"},
+                {"title": "去中心化AI受到关注", "url": "https://example.com/tao3", "source": "Wired"}
+            ],
+            "KAS": [
+                {"title": "Kaspa交易速度突破每秒10笔", "url": "https://example.com/kas1", "source": "Kaspa Blog"},
+                {"title": "Kaspa社区扩容提案获得支持", "url": "https://example.com/kas2", "source": "Reddit"},
+                {"title": "Kaspa技术优势明显", "url": "https://example.com/kas3", "source": "Twitter"}
+            ]
         }
         return mock_data.get(symbol, [])
 
@@ -532,7 +562,10 @@ class MemeCoinMonitor:
             if news:
                 report += "\n**最新新闻:**\n"
                 for n in news[:5]:
-                    report += f"- {n}\n"
+                    if isinstance(n, dict):
+                        report += f"- [{n.get('title', '')}]({n.get('url', '')})\n"
+                    else:
+                        report += f"- {n}\n"
 
             # 添加X平台帖子
             x_posts = coin.get('x_posts', [])
@@ -596,7 +629,10 @@ class MemeCoinMonitor:
             if news:
                 report += "\n**最新新闻:**\n"
                 for n in news[:5]:
-                    report += f"- {n}\n"
+                    if isinstance(n, dict):
+                        report += f"- [{n.get('title', '')}]({n.get('url', '')})\n"
+                    else:
+                        report += f"- {n}\n"
 
             # 添加X平台帖子
             x_posts = coin.get('x_posts', [])
@@ -635,7 +671,7 @@ Meme币风险极高，可能:
 ---
 
 生成者: AI Agent
-系统: 加密货币监控工具 v2.4
+系统: 加密货币监控工具 v2.5
 版本: 真实API集成版 - DexScreener/CoinGecko/Twitter/NewsAPI
 """
 

@@ -88,15 +88,32 @@ def generate_coin_detail(coin, is_meme=True):
         </div>
         '''
 
-    # 新闻
+    # 新闻 - 处理字典列表格式
     news_html = ''
     for news in coin.get('news', [])[:5]:
-        news_html += f'''
-        <div class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50">
-            <span class="text-yellow-500 mt-0.5 text-sm">●</span>
-            <p class="text-gray-300 text-sm line-clamp-2">{news}</p>
-        </div>
-        '''
+        if isinstance(news, dict):
+            # 新格式：包含title和url的字典
+            news_title = news.get('title', '')
+            news_url = news.get('url', '#')
+            news_source = news.get('source', 'News')
+            news_html += f'''
+            <a href="{news_url}" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">{news_title}</p>
+                    <p class="text-xs text-gray-500 mt-1">{news_source}</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            '''
+        else:
+            # 旧格式：字符串
+            news_html += f'''
+            <div class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <p class="text-gray-300 text-sm line-clamp-2">{news}</p>
+            </div>
+            '''
 
     # 高频关键词
     keywords = coin.get('high_frequency_keywords', [])
@@ -291,7 +308,7 @@ def generate_html(meme_coins, mainstream_coins):
         }}
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-gray-900 to-grayares-800 min-h-screen text-gray-100">
+<body class="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 min-h-screen text-gray-100">
     <!-- Header -->
     <header class="border-b border-gray-800 bg-gray-900/50 backdrop-blur-xl sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
@@ -322,7 +339,7 @@ def generate_html(meme_coins, mainstream_coins):
     <main class="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <!-- Hero Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
-            <div class="glass rounded-2xl p-4 md:p:p-6 glow">
+            <div class="glass rounded-2xl p-4 md:p-6 glow">
                 <div class="text-xs text-gray-400 mb-2">Meme币总数</div>
                 <div class="text-3xl md:text-4xl font-bold text-white">{len(meme_coins)}</div>
                 <div class="text-xs text-gray-400 mt-1">pump.fun热门项目</div>
@@ -370,6 +387,10 @@ def generate_html(meme_coins, mainstream_coins):
         </div>
 
         <!-- Meme Coins Section -->
+''
+
+    if meme_coins:
+        html += f'''
         <section class="mb-12 md:mb-16">
             <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4 md:mb-6">
                 <h2 class="text-2xl md:text-3xl font-bold text-white">🎲 Meme币板块</h2>
@@ -381,7 +402,17 @@ def generate_html(meme_coins, mainstream_coins):
                 {meme_cards}
             </div>
         </section>
+        '''
+    else:
+        html += '''
+        <section class="mb-12 md:mb-16">
+            <div class="bg-gray-800/50 rounded-xl p-6 text-center">
+                <p class="text-gray-400">暂无Meme币数据，API可能受限或网络连接问题</p>
+            </div>
+        </section>
+        '''
 
+    html += f'''
         <!-- Mainstream Coins Section -->
         <section>
             <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4 md:mb-6">
