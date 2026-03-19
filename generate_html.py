@@ -387,7 +387,7 @@ def generate_html(meme_coins, mainstream_coins):
         </div>
 
         <!-- Meme Coins Section -->
-''
+    '''
 
     if meme_coins:
         html += f'''
