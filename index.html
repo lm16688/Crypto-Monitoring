@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Monitoring — 加密货币热点监控</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glass {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border:1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow {
+            box-shadow: 0 0 40px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 min-h-screen text-gray-100">
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-gray-900/50 backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-xl md:text-2xl glow">
+                        🚀
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold gradient-text">Crypto Monitoring</h1>
+                        <p class="text-xs md:text-sm text-gray-400 mt-0.5">加密货币热点监控系统</p>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4">
+                    <div class="glass rounded-lg px-3 md:px-4 py-2 flex items-center gap-2">
+                        <span class="text-yellow-400">●</span>
+                        <span class="text-xs md:text-sm text-gray-300">实时更新</span>
+                    </div>
+                    <div class="glass rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm text-gray-300">
+                        更新于 2026-05-05 22:51:20
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+        <!-- Hero Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
+            <div class="glass rounded-2xl p-4 md:p-6 glow">
+                <div class="text-xs text-gray-400 mb-2">Meme币总数</div>
+                <div class="text-3xl md:text-4xl font-bold text-white">0</div>
+                <div class="text-xs text-gray-400 mt-1">pump.fun热门项目</div>
+            </div>
+            <div class="glass rounded-2xl p-4 md:p-6">
+                <div class="text-xs text-gray-400 mb-2">主流币总数</div>
+                <div class="text-3xl md:text-4xl font-bold text-white">5</div>
+                <div class="text-xs text-gray-400 mt-1">BTC/ETH/SOL等</div>
+            </div>
+            <div class="glass rounded-2xl p-4 md:p-6">
+                <div class="text-xs text-gray-400 mb-2">高评分项目</div>
+                <div class="text-3xl md:text-4xl font-bold text-green-400">1</div>
+                <div class="text-xs text-gray-400 mt-1">评分 ≥ 80</div>
+            </div>
+            <div class="glass rounded-2xl p-4 md:p-6">
+                <div class="text-xs text-gray-400 mb-2">平均评分</div>
+                <div class="text-3xl md:text-4xl font-bold text-purple-400">27.5</div>
+                <div class="text-xs text-gray-400 mt-1">综合评分</div>
+            </div>
+        </div>
+
+        <!-- Data Sources -->
+        <div class="glass rounded-2xl p-3 md:p-4 mb-6 md:mb-8 flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-4 md:gap-6 text-xs md:text-sm text-gray-400">
+                <span class="flex items-center gap-2">
+                    <span class="text-blue-400">●</span>
+                    CoinGecko
+                </span>
+                <span class="flex items-center gap-2">
+                    <span class="text-purple-400">●</span>
+                    X Platform
+                </span>
+                <span class="flex items-center gap-2">
+                    <span class="text-green-400">●</span>
+                    NewsAPI
+                </span>
+                <span class="flex items-center gap-2">
+                    <span class="text-yellow-400">●</span>
+                    pump.fun
+                </span>
+            </div>
+            <div class="text-xs text-gray-500">
+                ⚠️ 仅供参考，不构成投资建议
+            </div>
+        </div>
+
+        <!-- Meme Coins Section -->
+    
+        <section class="mb-12 md:mb-16">
+            <div class="bg-gray-800/50 rounded-xl p-6 text-center">
+                <p class="text-gray-400">暂无Meme币数据，API可能受限或网络连接问题</p>
+            </div>
+        </section>
+        
+        <!-- Mainstream Coins Section -->
+        <section>
+            <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4 md:mb-6">
+                <h2 class="text-2xl md:text-3xl font-bold text-white">💎 主流币板块</h2>
+                <span class="glass rounded-full px-3 md:px-4 py-2 text-xs md:text-sm text-gray-300">5 个</span>
+            </div>
+            <p class="text-gray-400 mb-6 md:mb-8 text-sm md:text-lg">BTC/ETH/SOL/TAO/KAS等知名主流加密货币</p>
+
+            <div class="grid grid-cols-1 gap-4 md:gap-6">
+                
+    <div class="bg-gray-900/50 rounded-2xl p-4 md:p-6 border border-gray-800 hover:border-gray-700 transition-all duration-300 mb-6">
+        <!-- 头部 -->
+        <div class="flex flex-col md:flex-row md:items-start justify-between mb-4 md:mb-6 pb-4 md:pb-6 border-b border-gray-800 gap-4">
+            <div class="flex items-center gap-3 md:gap-5">
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-xl md:text-2xl shadow-lg">
+                    TA
+                </div>
+                <div>
+                    <h3 class="text-xl md:text-2xl font-bold text-white mb-1">Bittensor</h3>
+                    <p class="text-sm md:text-base text-gray-400">TAO</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="px-2 md:px-3 py-1 rounded-lg bg-green-500/20 text-green-400 font-semibold text-xs md:text-sm">
+                            80/100
+                        </span>
+                        <span class="text-base md:text-lg">🟢 重点跟踪</span>
+                    </div>
+                </div>
+            </div>
+            <a href="https://twitter.com/search?q=TAO" target="_blank" class="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors self-start">
+                🐦 X平台社区
+            </a>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">价格</div>
+                <div class="text-lg md:text-xl font-bold text-white">$295.83</div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">持有人数</div>
+                <div class="text-lg md:text-xl font-bold text-white">850K</div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">24h涨幅</div>
+                <div class="text-lg md:text-xl font-bold text-green-400">
+                    +3.05%
+                </div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">创建时间</div>
+                <div class="text-sm md:text-base font-bold text-white">2023-11-01</div>
+            </div>
+        </div>
+
+        <!-- 合约地址 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <span>📋</span>
+                <span>合约地址</span>
+            </div>
+            <div class="text-gray-300 text-xs md:text-sm font-mono break-all bg-gray-900/50 p-2 md:p-3 rounded-lg">
+                Bittensor Mainnet
+            </div>
+        </div>
+
+        <!-- 项目故事 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <span>📖</span>
+                <span>项目故事</span>
+            </div>
+            <p class="text-gray-300 text-sm leading-relaxed">Bittensor是去中心化AI网络，创建了一个开放的AI算力市场，任何人都可以贡献和获得奖励。</p>
+        </div>
+
+        <!-- 核心叙事 -->
+        <div class="bg-purple-500/10 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-purple-500/30">
+            <div class="text-xs text-purple-300 mb-2 flex items-center gap-2">
+                <span>💭</span>
+                <span>核心叙事</span>
+            </div>
+            <p class="text-gray-200 text-sm font-medium">AI + 去中心化 - AI算力市场</p>
+        </div>
+
+        <!-- X平台信息 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-3 md:mb-4 flex items-center gap-2">
+                <span>🐦</span>
+                <span>X平台信息</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <div>
+                    <div class="text-xs text-gray-500 mb-1">官方账号</div>
+                    <a href="https://twitter.com/search?q=TAO" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm font-medium">
+                        @TAO
+                    </a>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500 mb-1">社区讨论</div>
+                    <a href="https://twitter.com/search?q=TAO" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm">
+                        查看讨论 <span>→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 双栏内容 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <!-- X平台帖子 -->
+            <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-3 md:mb-4 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <span>🐦</span>
+                        <span>X平台热门帖子</span>
+                    </span>
+                    <a href="https://twitter.com/search?q=TAO" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs">
+                        查看更多 →
+                    </a>
+                </div>
+                <div class="space-y-3 md:space-y-4">
+                    <div class="text-gray-500 text-sm text-center py-4">暂无热门帖子</div>
+                </div>
+            </div>
+
+            <!-- 新闻 + 高频关键词 -->
+            <div class="space-y-3 md:space-y-4">
+                <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                    <div class="text-xs text-gray-400 mb-3 flex items-center gap-2">
+                        <span>📰</span>
+                        <span>相关新闻</span>
+                    </div>
+                    <div class="space-y-2">
+                        
+            <a href="https://example.com/tao1" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">Bittensor AI算力市场增长</p>
+                    <p class="text-xs text-gray-500 mt-1">AI News</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+            <a href="https://example.com/tao2" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">多个AI项目集成TAO网络</p>
+                    <p class="text-xs text-gray-500 mt-1">Medium</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+            <a href="https://example.com/tao3" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">去中心化AI受到关注</p>
+                    <p class="text-xs text-gray-500 mt-1">Wired</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+                    </div>
+                </div>
+
+                <!-- 高频关键词 -->
+                <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                    <div class="text-xs text-gray-400 mb-3 flex items-center gap-2">
+                        <span>🔤</span>
+                        <span>高频讨论关键词</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">Bittensor</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">去中心化AI</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">AI算力</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">机器学习</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-gray-900/50 rounded-2xl p-4 md:p-6 border border-gray-800 hover:border-gray-700 transition-all duration-300 mb-6">
+        <!-- 头部 -->
+        <div class="flex flex-col md:flex-row md:items-start justify-between mb-4 md:mb-6 pb-4 md:pb-6 border-b border-gray-800 gap-4">
+            <div class="flex items-center gap-3 md:gap-5">
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-xl md:text-2xl shadow-lg">
+                    ET
+                </div>
+                <div>
+                    <h3 class="text-xl md:text-2xl font-bold text-white mb-1">Ethereum</h3>
+                    <p class="text-sm md:text-base text-gray-400">ETH</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="px-2 md:px-3 py-1 rounded-lg bg-yellow-500/20 text-yellow-400 font-semibold text-xs md:text-sm">
+                            70/100
+                        </span>
+                        <span class="text-base md:text-lg">🟡 值得关注</span>
+                    </div>
+                </div>
+            </div>
+            <a href="https://twitter.com/search?q=ETH" target="_blank" class="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors self-start">
+                🐦 X平台社区
+            </a>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">价格</div>
+                <div class="text-lg md:text-xl font-bold text-white">$2,362</div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">持有人数</div>
+                <div class="text-lg md:text-xl font-bold text-white">120.0M</div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">24h涨幅</div>
+                <div class="text-lg md:text-xl font-bold text-green-400">
+                    +0.27%
+                </div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">创建时间</div>
+                <div class="text-sm md:text-base font-bold text-white">2015-07-30</div>
+            </div>
+        </div>
+
+        <!-- 合约地址 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <span>📋</span>
+                <span>合约地址</span>
+            </div>
+            <div class="text-gray-300 text-xs md:text-sm font-mono break-all bg-gray-900/50 p-2 md:p-3 rounded-lg">
+                Ethereum Mainnet
+            </div>
+        </div>
+
+        <!-- 项目故事 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <span>📖</span>
+                <span>项目故事</span>
+            </div>
+            <p class="text-gray-300 text-sm leading-relaxed">以太坊是智能合约平台，开创了DeFi和NFT时代，是Web3基础设施的核心。</p>
+        </div>
+
+        <!-- 核心叙事 -->
+        <div class="bg-purple-500/10 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-purple-500/30">
+            <div class="text-xs text-purple-300 mb-2 flex items-center gap-2">
+                <span>💭</span>
+                <span>核心叙事</span>
+            </div>
+            <p class="text-gray-200 text-sm font-medium">世界计算机 - DeFi/NFT基础设施</p>
+        </div>
+
+        <!-- X平台信息 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-3 md:mb-4 flex items-center gap-2">
+                <span>🐦</span>
+                <span>X平台信息</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <div>
+                    <div class="text-xs text-gray-500 mb-1">官方账号</div>
+                    <a href="https://twitter.com/search?q=ETH" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm font-medium">
+                        @ETH
+                    </a>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500 mb-1">社区讨论</div>
+                    <a href="https://twitter.com/search?q=ETH" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm">
+                        查看讨论 <span>→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 双栏内容 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <!-- X平台帖子 -->
+            <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-3 md:mb-4 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <span>🐦</span>
+                        <span>X平台热门帖子</span>
+                    </span>
+                    <a href="https://twitter.com/search?q=ETH" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs">
+                        查看更多 →
+                    </a>
+                </div>
+                <div class="space-y-3 md:space-y-4">
+                    <div class="text-gray-500 text-sm text-center py-4">暂无热门帖子</div>
+                </div>
+            </div>
+
+            <!-- 新闻 + 高频关键词 -->
+            <div class="space-y-3 md:space-y-4">
+                <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                    <div class="text-xs text-gray-400 mb-3 flex items-center gap-2">
+                        <span>📰</span>
+                        <span>相关新闻</span>
+                    </div>
+                    <div class="space-y-2">
+                        
+            <a href="https://example.com/eth1" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">以太坊Layer 2 TVL突破新高</p>
+                    <p class="text-xs text-gray-500 mt-1">Decrypt</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+            <a href="https://example.com/eth2" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">以太坊坎昆升级进展</p>
+                    <p class="text-xs text-gray-500 mt-1">Ethereum Blog</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+            <a href="https://example.com/eth3" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">DeFi生态持续繁荣</p>
+                    <p class="text-xs text-gray-500 mt-1">DeFi Llama</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+                    </div>
+                </div>
+
+                <!-- 高频关键词 -->
+                <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                    <div class="text-xs text-gray-400 mb-3 flex items-center gap-2">
+                        <span>🔤</span>
+                        <span>高频讨论关键词</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">以太坊</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">DeFi</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">Layer 2</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">智能合约</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-gray-900/50 rounded-2xl p-4 md:p-6 border border-gray-800 hover:border-gray-700 transition-all duration-300 mb-6">
+        <!-- 头部 -->
+        <div class="flex flex-col md:flex-row md:items-start justify-between mb-4 md:mb-6 pb-4 md:pb-6 border-b border-gray-800 gap-4">
+            <div class="flex items-center gap-3 md:gap-5">
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-xl md:text-2xl shadow-lg">
+                    SO
+                </div>
+                <div>
+                    <h3 class="text-xl md:text-2xl font-bold text-white mb-1">Solana</h3>
+                    <p class="text-sm md:text-base text-gray-400">SOL</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="px-2 md:px-3 py-1 rounded-lg bg-red-500/20 text-red-400 font-semibold text-xs md:text-sm">
+                            45/100
+                        </span>
+                        <span class="text-base md:text-lg">🟡 中等关注</span>
+                    </div>
+                </div>
+            </div>
+            <a href="https://twitter.com/search?q=SOL" target="_blank" class="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors self-start">
+                🐦 X平台社区
+            </a>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">价格</div>
+                <div class="text-lg md:text-xl font-bold text-white">$86.34</div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">持有人数</div>
+                <div class="text-lg md:text-xl font-bold text-white">4.5M</div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">24h涨幅</div>
+                <div class="text-lg md:text-xl font-bold text-green-400">
+                    +2.50%
+                </div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">创建时间</div>
+                <div class="text-sm md:text-base font-bold text-white">2020-03-16</div>
+            </div>
+        </div>
+
+        <!-- 合约地址 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <span>📋</span>
+                <span>合约地址</span>
+            </div>
+            <div class="text-gray-300 text-xs md:text-sm font-mono break-all bg-gray-900/50 p-2 md:p-3 rounded-lg">
+                Solana Mainnet
+            </div>
+        </div>
+
+        <!-- 项目故事 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <span>📖</span>
+                <span>项目故事</span>
+            </div>
+            <p class="text-gray-300 text-sm leading-relaxed">Solana是高性能区块链，以其快速的交易速度和低费用著称，是DePIN和Meme币生态的热门平台。</p>
+        </div>
+
+        <!-- 核心叙事 -->
+        <div class="bg-purple-500/10 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-purple-500/30">
+            <div class="text-xs text-purple-300 mb-2 flex items-center gap-2">
+                <span>💭</span>
+                <span>核心叙事</span>
+            </div>
+            <p class="text-gray-200 text-sm font-medium">高性能公链 - DePIN/Meme币生态</p>
+        </div>
+
+        <!-- X平台信息 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-3 md:mb-4 flex items-center gap-2">
+                <span>🐦</span>
+                <span>X平台信息</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <div>
+                    <div class="text-xs text-gray-500 mb-1">官方账号</div>
+                    <a href="https://twitter.com/search?q=SOL" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm font-medium">
+                        @SOL
+                    </a>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500 mb-1">社区讨论</div>
+                    <a href="https://twitter.com/search?q=SOL" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm">
+                        查看讨论 <span>→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 双栏内容 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <!-- X平台帖子 -->
+            <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-3 md:mb-4 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <span>🐦</span>
+                        <span>X平台热门帖子</span>
+                    </span>
+                    <a href="https://twitter.com/search?q=SOL" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs">
+                        查看更多 →
+                    </a>
+                </div>
+                <div class="space-y-3 md:space-y-4">
+                    <div class="text-gray-500 text-sm text-center py-4">暂无热门帖子</div>
+                </div>
+            </div>
+
+            <!-- 新闻 + 高频关键词 -->
+            <div class="space-y-3 md:space-y-4">
+                <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                    <div class="text-xs text-gray-400 mb-3 flex items-center gap-2">
+                        <span>📰</span>
+                        <span>相关新闻</span>
+                    </div>
+                    <div class="space-y-2">
+                        
+            <a href="https://example.com/sol1" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">Solana DePIN生态爆发</p>
+                    <p class="text-xs text-gray-500 mt-1">The Block</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+            <a href="https://example.com/sol2" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">Solana链上meme币热度创新纪录</p>
+                    <p class="text-xs text-gray-500 mt-1">CoinDesk</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+            <a href="https://example.com/sol3" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">Solana手机销量超预期</p>
+                    <p class="text-xs text-gray-500 mt-1">TechCrunch</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+                    </div>
+                </div>
+
+                <!-- 高频关键词 -->
+                <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                    <div class="text-xs text-gray-400 mb-3 flex items-center gap-2">
+                        <span>🔤</span>
+                        <span>高频讨论关键词</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">Solana</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">DePIN</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">Meme币</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">高性能</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-gray-900/50 rounded-2xl p-4 md:p-6 border border-gray-800 hover:border-gray-700 transition-all duration-300 mb-6">
+        <!-- 头部 -->
+        <div class="flex flex-col md:flex-row md:items-start justify-between mb-4 md:mb-6 pb-4 md:pb-6 border-b border-gray-800 gap-4">
+            <div class="flex items-center gap-3 md:gap-5">
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-xl md:text-2xl shadow-lg">
+                    BT
+                </div>
+                <div>
+                    <h3 class="text-xl md:text-2xl font-bold text-white mb-1">Bitcoin</h3>
+                    <p class="text-sm md:text-base text-gray-400">BTC</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="px-2 md:px-3 py-1 rounded-lg bg-red-500/20 text-red-400 font-semibold text-xs md:text-sm">
+                            40/100
+                        </span>
+                        <span class="text-base md:text-lg">🟡 中等关注</span>
+                    </div>
+                </div>
+            </div>
+            <a href="https://twitter.com/search?q=BTC" target="_blank" class="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors self-start">
+                🐦 X平台社区
+            </a>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">价格</div>
+                <div class="text-lg md:text-xl font-bold text-white">$81,054</div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">持有人数</div>
+                <div class="text-lg md:text-xl font-bold text-white">21.0M</div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">24h涨幅</div>
+                <div class="text-lg md:text-xl font-bold text-green-400">
+                    +1.18%
+                </div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">创建时间</div>
+                <div class="text-sm md:text-base font-bold text-white">2009-01-03</div>
+            </div>
+        </div>
+
+        <!-- 合约地址 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <span>📋</span>
+                <span>合约地址</span>
+            </div>
+            <div class="text-gray-300 text-xs md:text-sm font-mono break-all bg-gray-900/50 p-2 md:p-3 rounded-lg">
+                Bitcoin Mainnet
+            </div>
+        </div>
+
+        <!-- 项目故事 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <span>📖</span>
+                <span>项目故事</span>
+            </div>
+            <p class="text-gray-300 text-sm leading-relaxed">比特币是第一个去中心化加密货币，由中本聪创立，开创了区块链和加密货币时代。</p>
+        </div>
+
+        <!-- 核心叙事 -->
+        <div class="bg-purple-500/10 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-purple-500/30">
+            <div class="text-xs text-purple-300 mb-2 flex items-center gap-2">
+                <span>💭</span>
+                <span>核心叙事</span>
+            </div>
+            <p class="text-gray-200 text-sm font-medium">数字黄金 - 价值存储</p>
+        </div>
+
+        <!-- X平台信息 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-3 md:mb-4 flex items-center gap-2">
+                <span>🐦</span>
+                <span>X平台信息</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <div>
+                    <div class="text-xs text-gray-500 mb-1">官方账号</div>
+                    <a href="https://twitter.com/search?q=BTC" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm font-medium">
+                        @BTC
+                    </a>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500 mb-1">社区讨论</div>
+                    <a href="https://twitter.com/search?q=BTC" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm">
+                        查看讨论 <span>→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 双栏内容 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <!-- X平台帖子 -->
+            <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-3 md:mb-4 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <span>🐦</span>
+                        <span>X平台热门帖子</span>
+                    </span>
+                    <a href="https://twitter.com/search?q=BTC" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs">
+                        查看更多 →
+                    </a>
+                </div>
+                <div class="space-y-3 md:space-y-4">
+                    <div class="text-gray-500 text-sm text-center py-4">暂无热门帖子</div>
+                </div>
+            </div>
+
+            <!-- 新闻 + 高频关键词 -->
+            <div class="space-y-3 md:space-y-4">
+                <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                    <div class="text-xs text-gray-400 mb-3 flex items-center gap-2">
+                        <span>📰</span>
+                        <span>相关新闻</span>
+                    </div>
+                    <div class="space-y-2">
+                        
+            <a href="https://example.com/btc1" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">比特币ETF资金流入创新高</p>
+                    <p class="text-xs text-gray-500 mt-1">CryptoNews</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+            <a href="https://example.com/btc2" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">MicroStrategy增持比特币</p>
+                    <p class="text-xs text-gray-500 mt-1">Bloomberg</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+            <a href="https://example.com/btc3" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">比特币挖矿难度再创新高</p>
+                    <p class="text-xs text-gray-500 mt-1">Coindesk</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+                    </div>
+                </div>
+
+                <!-- 高频关键词 -->
+                <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                    <div class="text-xs text-gray-400 mb-3 flex items-center gap-2">
+                        <span>🔤</span>
+                        <span>高频讨论关键词</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">比特币</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">ETF</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">挖矿</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">价值存储</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-gray-900/50 rounded-2xl p-4 md:p-6 border border-gray-800 hover:border-gray-700 transition-all duration-300 mb-6">
+        <!-- 头部 -->
+        <div class="flex flex-col md:flex-row md:items-start justify-between mb-4 md:mb-6 pb-4 md:pb-6 border-b border-gray-800 gap-4">
+            <div class="flex items-center gap-3 md:gap-5">
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-xl md:text-2xl shadow-lg">
+                    KA
+                </div>
+                <div>
+                    <h3 class="text-xl md:text-2xl font-bold text-white mb-1">Kaspa</h3>
+                    <p class="text-sm md:text-base text-gray-400">KAS</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="px-2 md:px-3 py-1 rounded-lg bg-red-500/20 text-red-400 font-semibold text-xs md:text-sm">
+                            40/100
+                        </span>
+                        <span class="text-base md:text-lg">🟡 中等关注</span>
+                    </div>
+                </div>
+            </div>
+            <a href="https://twitter.com/search?q=KAS" target="_blank" class="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 px-3 md:px-4 py-2 rounded-lg text-sm font-medium transition-colors self-start">
+                🐦 X平台社区
+            </a>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">价格</div>
+                <div class="text-lg md:text-xl font-bold text-white">$0.0343</div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">持有人数</div>
+                <div class="text-lg md:text-xl font-bold text-white">2.3M</div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">24h涨幅</div>
+                <div class="text-lg md:text-xl font-bold text-green-400">
+                    +2.58%
+                </div>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-3 md:p-4 text-center border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-2">创建时间</div>
+                <div class="text-sm md:text-base font-bold text-white">2021-11-07</div>
+            </div>
+        </div>
+
+        <!-- 合约地址 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <span>📋</span>
+                <span>合约地址</span>
+            </div>
+            <div class="text-gray-300 text-xs md:text-sm font-mono break-all bg-gray-900/50 p-2 md:p-3 rounded-lg">
+                Kaspa Mainnet
+            </div>
+        </div>
+
+        <!-- 项目故事 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-2 flex items-center gap-2">
+                <span>📖</span>
+                <span>项目故事</span>
+            </div>
+            <p class="text-gray-300 text-sm leading-relaxed">Kaspa是高速工作量证明区块链，使用DAG技术实现了每秒数笔的交易速度，是下一代PoW的代表。</p>
+        </div>
+
+        <!-- 核心叙事 -->
+        <div class="bg-purple-500/10 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-purple-500/30">
+            <div class="text-xs text-purple-300 mb-2 flex items-center gap-2">
+                <span>💭</span>
+                <span>核心叙事</span>
+            </div>
+            <p class="text-gray-200 text-sm font-medium">下一代PoW - DAGKAS技术</p>
+        </div>
+
+        <!-- X平台信息 -->
+        <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 mb-4 md:mb-6 border border-gray-700/50">
+            <div class="text-xs text-gray-400 mb-3 md:mb-4 flex items-center gap-2">
+                <span>🐦</span>
+                <span>X平台信息</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                <div>
+                    <div class="text-xs text-gray-500 mb-1">官方账号</div>
+                    <a href="https://twitter.com/search?q=KAS" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm font-medium">
+                        @KAS
+                    </a>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500 mb-1">社区讨论</div>
+                    <a href="https://twitter.com/search?q=KAS" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm">
+                        查看讨论 <span>→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 双栏内容 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <!-- X平台帖子 -->
+            <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                <div class="text-xs text-gray-400 mb-3 md:mb-4 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <span>🐦</span>
+                        <span>X平台热门帖子</span>
+                    </span>
+                    <a href="https://twitter.com/search?q=KAS" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs">
+                        查看更多 →
+                    </a>
+                </div>
+                <div class="space-y-3 md:space-y-4">
+                    <div class="text-gray-500 text-sm text-center py-4">暂无热门帖子</div>
+                </div>
+            </div>
+
+            <!-- 新闻 + 高频关键词 -->
+            <div class="space-y-3 md:space-y-4">
+                <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                    <div class="text-xs text-gray-400 mb-3 flex items-center gap-2">
+                        <span>📰</span>
+                        <span>相关新闻</span>
+                    </div>
+                    <div class="space-y-2">
+                        
+            <a href="https://example.com/kas1" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">Kaspa交易速度突破每秒10笔</p>
+                    <p class="text-xs text-gray-500 mt-1">Kaspa Blog</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+            <a href="https://example.com/kas2" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">Kaspa社区扩容提案获得支持</p>
+                    <p class="text-xs text-gray-500 mt-1">Reddit</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+            <a href="https://example.com/kas3" target="_blank" class="flex items-start gap-3 p-3 hover:bg-gray-800/50 rounded-lg transition-colors border-l-2 border-yellow-500/50 block group">
+                <span class="text-yellow-500 mt-0.5 text-sm">●</span>
+                <div class="flex-1">
+                    <p class="text-gray-300 text-sm line-clamp-2 group-hover:text-white transition-colors">Kaspa技术优势明显</p>
+                    <p class="text-xs text-gray-500 mt-1">Twitter</p>
+                </div>
+                <span class="text-blue-400 text-xs">→</span>
+            </a>
+            
+                    </div>
+                </div>
+
+                <!-- 高频关键词 -->
+                <div class="bg-gray-800/30 rounded-xl p-3 md:p-4 border border-gray-700/50">
+                    <div class="text-xs text-gray-400 mb-3 flex items-center gap-2">
+                        <span>🔤</span>
+                        <span>高频讨论关键词</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">Kaspa</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">PoW</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">DAG</span> <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">高速交易</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-12 md:mt-16">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                <div class="text-xs md:text-sm text-gray-400">
+                    数据来源：CoinGecko · X Platform · NewsAPI · pump.fun
+                </div>
+                <div class="text-xs md:text-sm text-gray-400">
+                    ⚠️ 仅供参考，不构成投资建议
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="text-xs md:text-sm text-gray-500">
+                    © 2025 Crypto Monitoring · 每小时自动更新
+                </div>
+                <a href="https://github.com/lm16688/Crypto-Monitoring" class="text-purple-400 hover:text-purple-300 text-xs md:text-sm">
+                    GitHub 仓库
+                </a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
